@@ -100,21 +100,18 @@ class ExtruderClient():
             if header is not None:
                 rcv_msg_type = msg_types_dict[header[0]][0]
                 print("{} received from Arduino.".format(rcv_msg_type))
-                print("Message: {}".format(msg))
+                if len(msg) != 0:
+                    print("Message: {}".format(msg))
                 headers.append(header)
                 msgs.append(msg)
                 wait_for_response = header[0] != MSG_EXECUTED
-                print("Still waiting? -> ", wait_for_response)
-            time.sleep(0.1)
         else:
             return(headers, msgs)
 
     def __read(self):
         try:
             self.msg_rcv.extend(self.sock.recv(1))
-            print(self.msg_rcv)
             header = struct.unpack_from(self.header_byteorder, self.msg_rcv)
-            print(header)
         except struct.error:
             return None, None
         else:
@@ -124,7 +121,6 @@ class ExtruderClient():
                 msg = struct.unpack_from(rcv_msg_byteorder, raw_msg)
             else:
                 msg = ""
-            print(msg)
             self.clear()
             return header, msg
 
