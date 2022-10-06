@@ -1,5 +1,6 @@
-from fabrication_control import Task
+from fabrication_manager import Task
 from extruder_control import ExtruderClient
+import time
 
 class EXTTask(Task):
     def __init__(self, ext_address=("192.168.0.220", 50004), key=None):
@@ -22,20 +23,22 @@ class EXTTask(Task):
     def run(self, _stop_flag):
         self._stop_flag = _stop_flag
         self.ec.connect()
-        while len(self.execute_functions)>0:
-            func = self.execute_functions[0]
-            method =list(func.keys())[0]
+        for func in self.execute_functions:
+            method = list(func.keys())[0]
             args = list(func.values())[0]
             method(*args)
-            self.execute_functions.remove(func)
+            # self.execute_functions.remove(func)
         self.ec.close()
+        self.is_running = False
+        self.is_completed = True
+        return True
 
 
 if __name__ == "__main__":
     exttask = EXTTask(ext_address=("192.168.0.220", 50004), key=0)
-    exttask.add_function("send_set_do", 8, 1, True)
-    exttask.add_function("send_motordata", 1, 24000, 10000, True)
+    # exttask.add_function("send_set_do", 8, 1, True)
+    exttask.add_function("send_motordata", 1, 13500, 1000, True)
     # exttask.add_function("send_motorstate", 0, True)
-    exttask.add_function("send_set_do", 8, 0, True)
-    exttask.add_function("send_motordata", 0, 24000, 10000, True)
+    # exttask.add_function("send_set_do", 8, 0, True)
+    # exttask.add_function("send_motordata", 0, 24000, 1000, True)
     exttask.run(lambda: False)

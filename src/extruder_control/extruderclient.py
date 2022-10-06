@@ -1,9 +1,9 @@
 import socket
 import struct
 import time
-from .message_types import msg_types_dict
-from .message_types import MSG_EXECUTED, MSG_STOP, MSG_INFO, MSG_DODATA
-from .message_types import MSG_MOTORDATA, MSG_MOTORSTATE
+from extruder_control.message_types import msg_types_dict
+from extruder_control.message_types import MSG_EXECUTED, MSG_STOP, MSG_INFO, MSG_DODATA
+from extruder_control.message_types import MSG_MOTORDATA, MSG_MOTORSTATE
 
 __all__ = [
     "ExtruderClient"
@@ -100,8 +100,8 @@ class ExtruderClient():
             if header is not None:
                 rcv_msg_type = msg_types_dict[header[0]][0]
                 print("{} received from Arduino.".format(rcv_msg_type))
-                if len(msg) != 0:
-                    print("Message: {}".format(msg))
+                # if len(msg) != 0:
+                #     print("Message: {}".format(msg))
                 headers.append(header)
                 msgs.append(msg)
                 wait_for_response = header[0] != MSG_EXECUTED
@@ -131,11 +131,11 @@ if __name__ == "__main__":
     time.sleep(0.5)
     print("Connection: ", ec.connected)
     wait = False
-    # ec.send_motordata(0, 0, 1600, 800, wait)
-    # ec.send_motorstate(0, 1, wait)
-    # time.sleep(5)
-    # ec.send_motorstate(0, 0, wait)
-    ec.send_set_do(8,1)
+    ec.send_motordata(0, 16000, 800, wait)
+    ec.send_motorstate(1, wait)
+    time.sleep(20)
+    ec.send_motorstate(0, wait)
+    # ec.send_set_do(8,1)
     time.sleep(0.5)
     ec.close()
     print("Connection: ", ec.connected)
