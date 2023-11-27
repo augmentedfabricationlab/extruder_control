@@ -23,6 +23,15 @@ class ExtruderClient():
     def clear(self):
         self.msg_rcv = bytearray([])
 
+    def __enter__(cls):
+        cls.connect()
+        print("Enter context: Socket connected...")
+        return cls
+
+    def __exit__(cls, typ, val, tb):
+        cls.close()
+        print("Exit context: Socket closed")
+
     def connect(self):
         if not hasattr(self, "sock"):
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -126,16 +135,14 @@ class ExtruderClient():
 
 
 if __name__ == "__main__":
-    ec = ExtruderClient(host="192.168.0.220", port=50004)
-    ec.connect()
-    time.sleep(0.5)
-    print("Connection: ", ec.connected)
-    wait = False
-    ec.send_motordata(0, 16000, 800, wait)
-    ec.send_motorstate(1, wait)
-    time.sleep(20)
-    ec.send_motorstate(0, wait)
-    # ec.send_set_do(8,1)
-    time.sleep(0.5)
-    ec.close()
+    with ExtruderClient(host="192.168.0.220", port=50004) as ec:
+        time.sleep(0.5)
+        print("Connection: ", ec.connected)
+        wait = True
+        ec.send_motordata(0, 16000, 800, wait)
+        ec.send_motorstate(1, wait)
+        time.sleep(20)
+        ec.send_motorstate(0, wait)
+        # ec.send_set_do(8,1)
+        time.sleep(0.5)
     print("Connection: ", ec.connected)
