@@ -5,6 +5,7 @@ import time
 class EXTTask(Task):
     def __init__(self, ext_address=("192.168.0.220", 50004), key=None):
         super(EXTTask, self).__init__(key)
+        self.ec = ExtruderClient(*ext_address)
         self.ext_address = ext_address
         # self.set_extruder_client(ext_address[0], ext_address[1])
         self.function_dictionary = {
